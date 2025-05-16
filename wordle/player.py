@@ -40,33 +40,26 @@ for i in palavras_possiveis:  # remove todas as palavras com tamanho invalido
 lista_palavras = palavras_filtradas.copy()
 
 
-def filtro(vermelhas):  # filtra a lista de lista_palavras possíveis, removendo todas as que tem letras eliminadas
+def filtro_red():  # filtra a lista de lista_palavras possíveis, removendo todas as que tem letras eliminadas
     placeholder = lista_palavras.copy()
     for word in placeholder:
         for char in word:
-            if char in vermelhas:
+            if char in eliminadas:
                 lista_palavras.remove(word)
                 break
     return lista_palavras
 
 
-def filtro2(amarelas):
-    placeholder = lista_palavras.copy()
-    for amarela in amarelas:
-        for word in placeholder:
-            if amarela[0] not in word:
-                lista_palavras.remove(word)
-            if amarela[0] in word and amarela[0] == word[amarela[1]]:
-                lista_palavras.remove(word)
-    return lista_palavras
+def filtro_yellow():
+    
 
 
-def filtro3(correta):
+def filtro_green():
     placeholder = lista_palavras.copy()
     for index, letra in enumerate(correta):
-        if letra:
+        if letra != "":
             for word in placeholder:
-                if word[index] != letra:
+                if word[index] != letra and word in lista_palavras:
                     lista_palavras.remove(word)
     return lista_palavras
 
@@ -88,7 +81,7 @@ def player(guess_hist, res_hist):
             [ultima_tentativa[3], correção[3]],
             [ultima_tentativa[4], correção[4]],
             ]
-        for indice, sublist in enumerate(a):
+        for posicao, sublist in enumerate(a):
             letra = sublist[0]
 
             match sublist[1]:   # verifica qual a resposta
@@ -105,15 +98,16 @@ def player(guess_hist, res_hist):
 
                 case "YELLOW":
                     if letra not in amarelas:
-                        amarelas.append([letra, indice])
+                        amarelas.append(letra)
                     if letra in eliminadas:
                         eliminadas.remove(letra)
 
         global lista_palavras
-        global lista_sem_filtro
 
         if len("".join(correta)) != 5:
-            
+            lista_palavras = filtro_red()
+            lista_palavras = filtro_green()
+            # lista_palavras = filtro_yellow()
             guess = random.choice(lista_palavras)
         else:
             guess = "".join(correta)
