@@ -43,36 +43,38 @@ lista_palavras = palavras_filtradas.copy()
 def filtro_red():  # filtra a lista de lista_palavras possíveis, removendo todas as que tem letras eliminadas
     placeholder = lista_palavras.copy()
     for word in placeholder:
-        for char in word:
-            if char in eliminadas:
+        for letra in eliminadas:
+            if letra in word:
                 lista_palavras.remove(word)
+                print(lista_palavras)
                 break
-    eliminadas.clear()
     return lista_palavras
 
 
 def filtro_yellow(letra, posição):
     placeholder = lista_palavras.copy()
     for word in placeholder:
-        if word[posição] == letra:
+        if letra not in word:
+            lista_palavras.remove(word)
+        else:
+            if word[posição] == letra:
+                lista_palavras.remove(word)
+    return lista_palavras
+
+
+def filtro_green(letra, posição):
+    placeholder = lista_palavras.copy()
+    for word in placeholder:
+        if letra not in word:
+            lista_palavras.remove(word)
+        elif word[posição] != letra:
             lista_palavras.remove(word)
     return lista_palavras
 
 
-def filtro_green():
-    placeholder = lista_palavras.copy()
-    for index, letra in enumerate(correta):
-        if letra != "":
-            for word in placeholder:
-                if word[index] != letra and word in lista_palavras:
-                    lista_palavras.remove(word)
-    return lista_palavras
-
-
 amarelas = []  # Letras que estão na palavra correta mas na posição errada
-eliminadas = []  # Letras que não estão na palavra correta
 correta = ["", "", "", "", ""]  # resposta correta, com as letras em ordem
-
+eliminadas = []
 
 def player(guess_hist, res_hist):
     global lista_palavras
@@ -93,23 +95,24 @@ def player(guess_hist, res_hist):
 
             match sublist[1]:   # verifica qual a resposta
                 case "GREEN":
-                    if letra in eliminadas:
-                        eliminadas.remove(letra)
                     # adiciona o caractere na posição correta
                     correta.pop(a.index(sublist))
                     correta.insert(a.index(sublist), letra)
+                    lista_palavras = filtro_green(letra, a.index(sublist))
 
                 case "RED":
-                    if letra not in eliminadas and letra not in amarelas:
+                    if letra in correta:
+                        eliminadas.pop(letra)
+                    elif letra in amarelas:
+                        eliminadas.pop(letra)
+                    else:
                         eliminadas.append(letra)
-                        lista_palavras = filtro_red()
 
                 case "YELLOW":
                     lista_palavras = filtro_yellow(letra, a.index(sublist))
 
         if len("".join(correta)) != 5:
-
-            lista_palavras = filtro_green()
+            lista_palavras = filtro_red()
             guess = random.choice(lista_palavras)
         else:
             guess = "".join(correta)
