@@ -47,11 +47,16 @@ def filtro_red():  # filtra a lista de lista_palavras possíveis, removendo toda
             if char in eliminadas:
                 lista_palavras.remove(word)
                 break
+    eliminadas.clear()
     return lista_palavras
 
 
-def filtro_yellow():
-    
+def filtro_yellow(letra, posição):
+    placeholder = lista_palavras.copy()
+    for word in placeholder:
+        if word[posição] == letra:
+            lista_palavras.remove(word)
+    return lista_palavras
 
 
 def filtro_green():
@@ -70,6 +75,8 @@ correta = ["", "", "", "", ""]  # resposta correta, com as letras em ordem
 
 
 def player(guess_hist, res_hist):
+    global lista_palavras
+
     if guess_hist != [] and res_hist != []:
         ultima_tentativa = guess_hist[-1]
         correção = res_hist[-1]
@@ -81,7 +88,7 @@ def player(guess_hist, res_hist):
             [ultima_tentativa[3], correção[3]],
             [ultima_tentativa[4], correção[4]],
             ]
-        for posicao, sublist in enumerate(a):
+        for sublist in a:
             letra = sublist[0]
 
             match sublist[1]:   # verifica qual a resposta
@@ -95,19 +102,14 @@ def player(guess_hist, res_hist):
                 case "RED":
                     if letra not in eliminadas and letra not in amarelas:
                         eliminadas.append(letra)
+                        lista_palavras = filtro_red()
 
                 case "YELLOW":
-                    if letra not in amarelas:
-                        amarelas.append(letra)
-                    if letra in eliminadas:
-                        eliminadas.remove(letra)
-
-        global lista_palavras
+                    lista_palavras = filtro_yellow(letra, a.index(sublist))
 
         if len("".join(correta)) != 5:
-            lista_palavras = filtro_red()
+
             lista_palavras = filtro_green()
-            # lista_palavras = filtro_yellow()
             guess = random.choice(lista_palavras)
         else:
             guess = "".join(correta)
