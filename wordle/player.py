@@ -1,8 +1,8 @@
 
 # Nome completo do primeiro membro: Roger Honorato
 # RA do primeiro membro: 247617
-# Nome completo do segundo membro: [Segundo membro da equipe]
-# RA do segundo membro: [Segundo membro da equipe]
+# Nome completo do segundo membro: Leonardo Paillo da Silva
+# RA do segundo membro: 198218
 
 """
 Implemente aqui o seu código para adivinhar a palavra.
@@ -29,28 +29,42 @@ Para mais informações, reveja o README.md
 """
 
 import random
-from utils import load_words, ALL_COLORS, load_words
+from utils import load_words, ALL_COLORS
 
-lista_sem_filtro = load_words()   # Carrega a lista de lista_palavras
-palavras_filtradas = lista_sem_filtro.copy()
+palavras_possiveis = load_words()   # Carrega a lista de palavras
+palavras_filtradas = palavras_possiveis.copy()
 
-for i in lista_sem_filtro:  # remove todas as lista_palavras com tamanho invalido
+for i in palavras_possiveis:  # remove todas as palavras com tamanho invalido
     if len(i) != 5:
         palavras_filtradas.remove(i)
 lista_palavras = palavras_filtradas.copy()
 
 
-def filtro(eliminadas):  # filtra a lista de lista_palavras possíveis, removendo todas as que tem letras eliminadas
+def filtro_red():  # filtra a lista de lista_palavras possíveis, removendo todas as que tem letras eliminadas
     placeholder = lista_palavras.copy()
     for word in placeholder:
         for char in word:
-            if (char in eliminadas):
+            if char in eliminadas:
                 lista_palavras.remove(word)
                 break
     return lista_palavras
 
 
-resp_chr = []  # Letras que estão na palavra correta
+def filtro_yellow():
+    
+
+
+def filtro_green():
+    placeholder = lista_palavras.copy()
+    for index, letra in enumerate(correta):
+        if letra != "":
+            for word in placeholder:
+                if word[index] != letra and word in lista_palavras:
+                    lista_palavras.remove(word)
+    return lista_palavras
+
+
+amarelas = []  # Letras que estão na palavra correta mas na posição errada
 eliminadas = []  # Letras que não estão na palavra correta
 correta = ["", "", "", "", ""]  # resposta correta, com as letras em ordem
 
@@ -67,13 +81,11 @@ def player(guess_hist, res_hist):
             [ultima_tentativa[3], correção[3]],
             [ultima_tentativa[4], correção[4]],
             ]
-        for sublist in a:
+        for posicao, sublist in enumerate(a):
             letra = sublist[0]
 
             match sublist[1]:   # verifica qual a resposta
                 case "GREEN":
-                    if letra not in resp_chr:
-                        resp_chr.append(letra)
                     if letra in eliminadas:
                         eliminadas.remove(letra)
                     # adiciona o caractere na posição correta
@@ -81,23 +93,31 @@ def player(guess_hist, res_hist):
                     correta.insert(a.index(sublist), letra)
 
                 case "RED":
-                    if letra not in eliminadas and (letra not in resp_chr):
+                    if letra not in eliminadas and letra not in amarelas:
                         eliminadas.append(letra)
 
                 case "YELLOW":
-                    if letra not in resp_chr:
-                        resp_chr.append(letra)
+                    if letra not in amarelas:
+                        amarelas.append(letra)
                     if letra in eliminadas:
                         eliminadas.remove(letra)
 
         global lista_palavras
-        global lista_sem_filtro
 
         if len("".join(correta)) != 5:
-            lista_palavras = filtro(eliminadas)
+            lista_palavras = filtro_red()
+            lista_palavras = filtro_green()
+            # lista_palavras = filtro_yellow()
             guess = random.choice(lista_palavras)
         else:
             guess = "".join(correta)
     else:
-        guess = random.choice(lista_palavras)
+        if 'TRACE' in lista_palavras:
+            guess = 'trace'
+        elif 'CLASE' in lista_palavras:
+            guess = 'clase'
+        elif 'METAL' in lista_palavras:
+            guess = 'metal'
+        elif 'ELICA' in lista_palavras:
+            guess = 'elica'
     return guess
